@@ -23,10 +23,10 @@ public:
     void SortTasksSmart() {
         sort(cachedTasks.begin(), cachedTasks.end(), [](const TaskDTO& a, const TaskDTO& b) {
 
-            if (a.priority != b.priority)
-                return a.priority < b.priority;
+            if (a.Priority != b.Priority)
+                return a.Priority < b.Priority;
 
-            return a.deadline < b.deadline;
+            return a.Deadline < b.Deadline;
             });
     }
 
@@ -36,8 +36,8 @@ public:
 
 
         for (auto& t : cachedTasks) {
-            if (t.id == taskId) {
-                t.statusId = newStatus;
+            if (t.Id == taskId) {
+                t.StatusId = newStatus;
                 break;
             }
         }
@@ -47,7 +47,7 @@ public:
         time_t now = time(0);
         int overdueCount = 0;
         for (const auto& t : cachedTasks) {
-            if (t.statusId != Status_Done && t.deadline < now) {
+            if (t.StatusId != Status_Done && t.Deadline < now) {
                 overdueCount++;
             }
         }

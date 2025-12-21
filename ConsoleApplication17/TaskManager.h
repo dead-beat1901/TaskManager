@@ -1,14 +1,17 @@
 #pragma once
-#include "DatabaseRepository.h"
 #include <vector>
 #include <algorithm>
+#include "Classes.h"
+#include "DatabaseRepository.h"
 
 class TaskManager {
 private:
-    DatabaseRepository repo;
     std::vector<TaskDTO> cache;
+    DatabaseRepository repo;
 
 public:
+    TaskManager() {}
+
     void Reload() {
         if (repo.Connect()) {
             cache = repo.LoadAllTasks();
@@ -17,14 +20,27 @@ public:
     }
 
     void Sort() {
+        if (cache.empty()) return;
+
         std::sort(cache.begin(), cache.end(), [](const TaskDTO& a, const TaskDTO& b) {
-            if (a.priority != b.priority) return a.priority < b.priority;
-            return a.deadline < b.deadline;
+            return a.Priority < b.Priority;
             });
     }
 
     TaskDTO* GetData(int* count) {
-        if (count) *count = (int)cache.size();
+        if (cache.empty()) {
+            if (count) *count = 0;
+            return nullptr;
+        }
+
+        if (count) {
+            *count = static_cast<int>(cache.size());
+        }
+
         return cache.data();
+    }
+
+    void Clear() {
+        cache.clear();
     }
 };

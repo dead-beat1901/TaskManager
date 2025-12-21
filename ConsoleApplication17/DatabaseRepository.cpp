@@ -28,8 +28,8 @@ void DatabaseRepository::Disconnect() {
     if (hEnv) SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
 }
 
-std::vector<TaskDTO> DatabaseRepository::LoadAllTasks() {
-    std::vector<TaskDTO> tasks;
+vector<TaskDTO> DatabaseRepository::LoadAllTasks() {
+    vector<TaskDTO> tasks;
     if (SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hStmt) != SQL_SUCCESS) return tasks;
 
     const wchar_t* sql = L"SELECT t.Id, t.Title, c.Name, t.Priority, t.StatusId, DATEDIFF(s, '1970-01-01', t.Deadline) "
@@ -39,30 +39,25 @@ std::vector<TaskDTO> DatabaseRepository::LoadAllTasks() {
         while (SQLFetch(hStmt) == SQL_SUCCESS) {
             TaskDTO t;
             SQLLEN ind;
-            SQLGetData(hStmt, 1, SQL_C_LONG, &t.id, 0, &ind);
-            SQLGetData(hStmt, 2, SQL_C_CHAR, t.title, sizeof(t.title), &ind);
-            SQLGetData(hStmt, 3, SQL_C_CHAR, t.categoryName, sizeof(t.categoryName), &ind);
-            SQLGetData(hStmt, 4, SQL_C_LONG, &t.priority, 0, &ind);
-            SQLGetData(hStmt, 5, SQL_C_LONG, &t.statusId, 0, &ind);
+
+            SQLGetData(hStmt, 1, SQL_C_LONG, &t.Id, 0, &ind);
+
+            SQLGetData(hStmt, 2, SQL_C_WCHAR, t.Title, sizeof(t.Title), &ind);
+
+            SQLGetData(hStmt, 3, SQL_C_WCHAR, t.CategoryName, sizeof(t.CategoryName), &ind);
+
+            SQLGetData(hStmt, 4, SQL_C_LONG, &t.Priority, 0, &ind);
+
+            SQLGetData(hStmt, 5, SQL_C_LONG, &t.StatusId, 0, &ind);
 
             long long ts;
             SQLGetData(hStmt, 6, SQL_C_SBIGINT, &ts, 0, &ind);
-            t.deadline = ts;
+            t.Deadline = ts;
+
             tasks.push_back(t);
         }
     }
     SQLFreeHandle(SQL_HANDLE_STMT, hStmt);
     hStmt = NULL;
     return tasks;
-}
-
-void DatabaseRepository::UpdateStatus(int taskId, int newStatus) {
-    SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hStmt);
-    const wchar_t* sql = L"UPDATE Tasks SET StatusId = ? WHERE Id = ?";
-    SQLPrepareW(hStmt, (SQLWCHAR*)sql, SQL_NTS);
-    SQLBindParameter(hStmt, 1, SQL_PARAM_INPUT, SQL_C_LONG, SQL_INTEGER, 0, 0, &newStatus, 0, NULL);
-    SQLBindParameter(hStmt, 2, SQL_PARAM_INPUT, SQL_C_LONG, SQL_INTEGER, 0, 0, &taskId, 0, NULL);
-    SQLExecute(hStmt);
-    SQLFreeHandle(SQL_HANDLE_STMT, hStmt);
-    hStmt = NULL;
 }

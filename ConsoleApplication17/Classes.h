@@ -17,10 +17,10 @@ enum TaskPriority {
 
 
 struct TaskDTO {
-    int id;
-    char title[100];
-    char categoryName[50];
-    int priority;
-    int statusId;
-    long long deadline;
+    int Id;
+    wchar_t Title[100];
+    wchar_t CategoryName[50];
+    int Priority;
+    int StatusId;             
+    long long Deadline;
 };

@@ -22,6 +22,6 @@ public:
     bool Connect();
     void Disconnect();
 
-    std::vector<TaskDTO> LoadAllTasks();
+    vector<TaskDTO> LoadAllTasks();
     void UpdateStatus(int taskId, int newStatus);
 };
