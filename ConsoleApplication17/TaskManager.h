@@ -1,46 +1,28 @@
 #pragma once
 #include <vector>
-#include <algorithm>
 #include "Classes.h"
 #include "DatabaseRepository.h"
 
+using namespace std;
+
 class TaskManager {
 private:
-    std::vector<TaskDTO> cache;
+    vector<TaskDTO> cache;
     DatabaseRepository repo;
 
 public:
-    TaskManager() {}
+    TaskManager();
 
-    void Reload() {
-        if (repo.Connect()) {
-            cache = repo.LoadAllTasks();
-            repo.Disconnect();
-        }
-    }
+    void Reload();
 
-    void Sort() {
-        if (cache.empty()) return;
+    void AddTask(const TaskDTO& task);
+    void UpdateTask(const TaskDTO& task);
+    void DeleteTask(int taskId);
+    void ChangeTaskStatus(int taskId, int newStatus);
 
-        std::sort(cache.begin(), cache.end(), [](const TaskDTO& a, const TaskDTO& b) {
-            return a.Priority < b.Priority;
-            });
-    }
+    void SortSmart();
+    int CheckDeadlines();
 
-    TaskDTO* GetData(int* count) {
-        if (cache.empty()) {
-            if (count) *count = 0;
-            return nullptr;
-        }
-
-        if (count) {
-            *count = static_cast<int>(cache.size());
-        }
-
-        return cache.data();
-    }
-
-    void Clear() {
-        cache.clear();
-    }
+    TaskDTO* GetData(int* count);
+    void Clear();
 };

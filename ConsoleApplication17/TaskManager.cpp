@@ -1,61 +1,83 @@
-#include "DatabaseRepository.h"
+#include "TaskManager.h"
 #include <algorithm>
 #include <ctime>
 
 using namespace std;
 
-class TaskManager {
-private:
-    DatabaseRepository dbRepo;
-    vector<TaskDTO> cachedTasks;
+TaskManager::TaskManager() {
+    repo.Connect();
+    Reload();
+}
 
-public:
-    TaskManager() {
-        dbRepo.Connect();
-        ReloadTasks();
-    }
+void TaskManager::Reload() {
+    cache = repo.LoadAllTasks();
+}
 
-    void ReloadTasks() {
-        cachedTasks = dbRepo.LoadAllTasks();
-    }
+void TaskManager::AddTask(const TaskDTO& task) {
+    repo.AddTask(task);
+    cache.push_back(task);
+}
 
+void TaskManager::UpdateTask(const TaskDTO& task) {
+    repo.UpdateTask(task);
 
-    void SortTasksSmart() {
-        sort(cachedTasks.begin(), cachedTasks.end(), [](const TaskDTO& a, const TaskDTO& b) {
-
-            if (a.Priority != b.Priority)
-                return a.Priority < b.Priority;
-
-            return a.Deadline < b.Deadline;
-            });
-    }
-
-    void ChangeTaskStatus(int taskId, int newStatus) {
-
-        dbRepo.UpdateStatus(taskId, newStatus);
-
-
-        for (auto& t : cachedTasks) {
-            if (t.Id == taskId) {
-                t.StatusId = newStatus;
-                break;
-            }
+    for (auto& t : cache) {
+        if (t.Id == task.Id) {
+            t = task;
+            break;
         }
     }
+}
 
-    int CheckDeadlines() {
-        time_t now = time(0);
-        int overdueCount = 0;
-        for (const auto& t : cachedTasks) {
-            if (t.StatusId != Status_Done && t.Deadline < now) {
-                overdueCount++;
-            }
+void TaskManager::DeleteTask(int taskId) {
+    repo.DeleteTask(taskId);
+
+    cache.erase(
+        remove_if(cache.begin(), cache.end(),
+            [taskId](const TaskDTO& t) {
+                return t.Id == taskId;
+            }),
+        cache.end()
+    );
+}
+
+void TaskManager::ChangeTaskStatus(int taskId, int newStatus) {
+    repo.UpdateStatus(taskId, newStatus);
+
+    for (auto& t : cache) {
+        if (t.Id == taskId) {
+            t.StatusId = newStatus;
+            break;
         }
-        return overdueCount;
     }
+}
 
-    TaskDTO* GetTasksData(int* count) {
-        *count = cachedTasks.size();
-        return cachedTasks.data();
+void TaskManager::SortSmart() {
+    sort(cache.begin(), cache.end(), [](const TaskDTO& a, const TaskDTO& b) {
+        if (a.Priority != b.Priority)
+            return a.Priority > b.Priority;
+        return a.Deadline < b.Deadline;
+        });
+}
+
+int TaskManager::CheckDeadlines() {
+    time_t now = time(nullptr);
+    int overdue = 0;
+
+    for (const auto& t : cache) {
+        if (t.StatusId != Status_Done && t.Deadline < now)
+            overdue++;
     }
-};
+    return overdue;
+}
+
+TaskDTO* TaskManager::GetData(int* count) {
+    if (count)
+        *count = static_cast<int>(cache.size());
+
+    return cache.empty() ? nullptr : cache.data();
+}
+
+void TaskManager::Clear() {
+    cache.clear();
+}

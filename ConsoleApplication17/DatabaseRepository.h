@@ -3,16 +3,15 @@
 #include <string>
 #include <windows.h>
 #include <sqlext.h>
-#include <sqltypes.h>
 #include "Classes.h"
 
 using namespace std;
 
-class DatabaseRepository {
+class DatabaseRepository
+{
 private:
-    SQLHENV hEnv;
-    SQLHDBC hDbc;
-    SQLHSTMT hStmt;
+    SQLHENV hEnv = SQL_NULL_HENV;
+    SQLHDBC hDbc = SQL_NULL_HDBC;
     wstring connectionString;
 
 public:
@@ -23,5 +22,10 @@ public:
     void Disconnect();
 
     vector<TaskDTO> LoadAllTasks();
+
+    void AddTask(const TaskDTO& task);
+    void DeleteTask(int taskId);
     void UpdateStatus(int taskId, int newStatus);
+    void UpdateTask(const TaskDTO& task);
+
 };
