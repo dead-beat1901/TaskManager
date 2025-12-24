@@ -1,6 +1,5 @@
 ﻿#pragma once
-#include <ctime>
-#include <string>
+#include <cstdint>
 
 enum TaskStatus {
     Status_New = 1,
@@ -8,11 +7,6 @@ enum TaskStatus {
     Status_Done = 3
 };
 
-enum TaskPriority {
-    Priority_High = 1,
-    Priority_Medium = 2,
-    Priority_Low = 3
-};
 
 struct TaskDTO {
     int Id;

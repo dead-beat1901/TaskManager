@@ -12,17 +12,11 @@ private:
 
 public:
     TaskManager();
-
     void Reload();
-
     void AddTask(const TaskDTO& task);
     void UpdateTask(const TaskDTO& task);
     void DeleteTask(int taskId);
     void ChangeTaskStatus(int taskId, int newStatus);
-
     void SortSmart();
-    int CheckDeadlines();
-
     TaskDTO* GetData(int* count);
-    void Clear();
 };

@@ -22,14 +22,14 @@ TaskDTO* __cdecl GetTasks(int* count)
     return cache.empty() ? nullptr : cache.data();
 }
 
-void __cdecl DisposeManager()
-{
-    repo.Disconnect();
-}
-
 void __cdecl AddTask(TaskDTO task)
 {
     repo.AddTask(task);
+}
+
+void __cdecl UpdateTask(TaskDTO task)
+{
+    repo.UpdateTask(task);
 }
 
 void __cdecl DeleteTask(int id)
@@ -40,4 +40,9 @@ void __cdecl DeleteTask(int id)
 void __cdecl ChangeStatus(int id, int status)
 {
     repo.UpdateStatus(id, status);
+}
+
+void __cdecl DisposeManager()
+{
+    repo.Disconnect();
 }
