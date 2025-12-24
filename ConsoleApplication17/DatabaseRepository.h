@@ -20,8 +20,10 @@ public:
     void Disconnect();
 
     vector<TaskDTO> LoadAllTasks();
+    vector<CategoryDTO> LoadCategories();
     void AddTask(const TaskDTO& task);
     void UpdateTask(const TaskDTO& task);
     void DeleteTask(int taskId);
     void UpdateStatus(int taskId, int newStatus);
+
 };

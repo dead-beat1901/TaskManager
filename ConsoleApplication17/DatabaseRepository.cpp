@@ -112,3 +112,31 @@ void DatabaseRepository::UpdateStatus(int taskId, int newStatus)
     SQLExecDirectW(stmt, (SQLWCHAR*)sql, SQL_NTS);
     SQLFreeHandle(SQL_HANDLE_STMT, stmt);
 }
+
+vector<CategoryDTO> DatabaseRepository::LoadCategories()
+{
+    vector<CategoryDTO> list;
+    SQLHSTMT stmt;
+
+    if (SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &stmt) != SQL_SUCCESS)
+        return list;
+
+    const wchar_t* sql = L"SELECT Id, Name FROM Categories";
+
+    if (SQLExecDirectW(stmt, (SQLWCHAR*)sql, SQL_NTS) == SQL_SUCCESS)
+    {
+        while (SQLFetch(stmt) == SQL_SUCCESS)
+        {
+            CategoryDTO c{};
+            SQLLEN ind;
+
+            SQLGetData(stmt, 1, SQL_C_LONG, &c.Id, 0, &ind);
+            SQLGetData(stmt, 2, SQL_C_WCHAR, c.Name, sizeof(c.Name), &ind);
+
+            list.push_back(c);
+        }
+    }
+
+    SQLFreeHandle(SQL_HANDLE_STMT, stmt);
+    return list;
+}

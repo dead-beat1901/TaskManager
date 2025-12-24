@@ -4,6 +4,9 @@
 static DatabaseRepository repo;
 static vector<TaskDTO> cache;
 
+static std::vector<TaskDTO> taskCache;
+static std::vector<CategoryDTO> categoryCache;
+
 void __cdecl InitManager()
 {
     repo.Connect();
@@ -42,7 +45,19 @@ void __cdecl ChangeStatus(int id, int status)
     repo.UpdateStatus(id, status);
 }
 
+CategoryDTO* __cdecl GetCategories(int* count)
+{
+    categoryCache = repo.LoadCategories();
+
+    if (count)
+        *count = static_cast<int>(categoryCache.size());
+
+    return categoryCache.empty() ? nullptr : categoryCache.data();
+}
+
 void __cdecl DisposeManager()
 {
     repo.Disconnect();
 }
+
+
