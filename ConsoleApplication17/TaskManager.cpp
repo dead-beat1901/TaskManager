@@ -11,12 +11,12 @@ TaskManager::TaskManager() {
 
 void TaskManager::Reload() {
     cache = repo.LoadAllTasks();
-    SortSmart(); // —ортируем сразу при загрузке
+    SortSmart();
 }
 
 void TaskManager::AddTask(const TaskDTO& task) {
     repo.AddTask(task);
-    Reload(); // ѕерезагружаем полностью, чтобы получить верный ID и сортировку
+    Reload();
 }
 
 void TaskManager::UpdateTask(const TaskDTO& task) {
